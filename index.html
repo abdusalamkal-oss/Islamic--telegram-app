@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Summariser</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a5fb4 0%, #26a269 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-desc {
+            opacity: 0.9;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            background: #ffffff;
+            color: #1a5fb4;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        
+        .file-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        /* Hide in browser, show in Telegram */
+        .telegram-only {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🕌 Islamic Summariser</h1>
+            <p class="subtitle">Mini App for Telegram Bot</p>
+            <p>AI-powered Islamic content summarization</p>
+            
+            <!-- This shows only in Telegram -->
+            <div id="telegram-info" class="telegram-only">
+                <p>Running inside Telegram Web App</p>
+                <p id="user-info"></p>
+            </div>
+        </header>
+        
+        <div class="feature-card">
+            <div class="feature-title">📖 Quran & Tafseer</div>
+            <div class="feature-desc">Get AI summaries of Quranic verses with explanations</div>
+            <button class="btn" onclick="openFeature('quran')">Open Quran Reader</button>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-title">🎙️ Voice Notes</div>
+            <div class="feature-desc">Upload Islamic lectures for transcription</div>
+            <input type="file" class="file-input" accept="audio/*" id="voiceInput" onchange="handleFile('voice', this)">
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-title">📄 PDF Processing</div>
+            <div class="feature-desc">Upload Islamic PDFs for summarization</div>
+            <input type="file" class="file-input" accept=".pdf" id="pdfInput" onchange="handleFile('pdf', this)">
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-title">🌙 Hadith Library</div>
+            <div class="feature-desc">Search and get Hadith explanations</div>
+            <button class="btn" onclick="openFeature('hadith')">Browse Hadith</button>
+        </div>
+        
+        <footer>
+            <p>Powered by free AI models • Arabic & Malayalam support</p>
+            <p>Open via @islamic_summariser_bot</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        let tg = window.Telegram.WebApp;
+        
+        // Function to check if running in Telegram
+        function isTelegramWebApp() {
+            return typeof window.Telegram !== 'undefined' && 
+                   window.Telegram.WebApp && 
+                   window.Telegram.WebApp.initData !== '';
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isTelegramWebApp()) {
+                // Running inside Telegram
+                console.log('Running in Telegram Web App');
+                
+                // Initialize Telegram Web App
+                tg.ready();
+                tg.expand();
+                tg.setHeaderColor('#1a5fb4');
+                tg.setBackgroundColor('#26a269');
+                
+                // Show Telegram info
+                document.getElementById('telegram-info').style.display = 'block';
+                
+                // Show user info if available
+                if (tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    document.getElementById('user-info').textContent = 
+                        `Welcome, ${user.first_name || 'User'}!`;
+                }
+                
+                // Set up Main Button
+                tg.MainButton.setText('Send to Bot').show();
+                tg.MainButton.onClick(function() {
+                    tg.sendData('action_from_mini_app');
+                    tg.close();
+                });
+                
+                // Show alert
+                tg.showAlert('Islamic Summariser Mini App loaded!');
+                
+            } else {
+                // Running in browser
+                console.log('Running in regular browser');
+                document.body.innerHTML += `
+                    <div style="background: #ff6b6b; color: white; padding: 15px; margin: 20px; border-radius: 10px;">
+                        <strong>⚠️ Note:</strong> This app is designed to run inside Telegram.
+                        <br>Open it via @islamic_summariser_bot for full functionality.
+                    </div>
+                `;
+            }
+        });
+        
+        // Feature functions
+        function openFeature(feature) {
+            if (isTelegramWebApp()) {
+                tg.sendData(`open_${feature}`);
+                tg.showAlert(`Opening ${feature} feature...`);
+            } else {
+                alert(`Feature: ${feature}\n(Would open in Telegram Mini App)`);
+            }
+        }
+        
+        function handleFile(type, input) {
+            const file = input.files[0];
+            if (file) {
+                if (isTelegramWebApp()) {
+                    tg.sendData(`${type}_upload:${file.name}`);
+                    tg.showAlert(`📁 ${type.toUpperCase()}: ${file.name} received!`);
+                } else {
+                    alert(`File selected: ${file.name}\n(Would upload in Telegram)`);
+                }
+            }
+        }
+        
+        // Back button handling
+        if (isTelegramWebApp()) {
+            tg.BackButton.show();
+            tg.BackButton.onClick(function() {
+                tg.sendData('back_pressed');
+                tg.close();
+            });
+        }
+    </script>
+</body>
+</html>
