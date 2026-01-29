@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Islamic Summariser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕌 Islamic Summariser</h1>
+        <div class="feature">
+            <h3>📖 Quran Summary</h3>
+            <p>Get summaries of Quran verses</p>
+            <button onclick="summarizeQuran()">Open Quran</button>
+        </div>
+        <div class="feature">
+            <h3>🎙️ Voice Notes</h3>
+            <p>Upload voice for transcription</p>
+            <input type="file" accept="audio/*" id="voiceInput">
+        </div>
+        <div class="feature">
+            <h3>📄 PDF Processing</h3>
+            <p>Upload Islamic PDFs</p>
+            <input type="file" accept=".pdf" id="pdfInput">
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Telegram Web App
+        let tg = window.Telegram.WebApp;
+        
+        // Expand to full screen
+        tg.expand();
+        
+        // Customize theme
+        tg.setHeaderColor('#667eea');
+        tg.setBackgroundColor('#764ba2');
+        
+        // Send data back to bot
+        function summarizeQuran() {
+            tg.sendData("quran_summary_request");
+            tg.close();
+        }
+        
+        // Handle file uploads
+        document.getElementById('pdfInput').addEventListener('change', function(e) {
+            let file = e.target.files[0];
+            tg.sendData(`pdf_upload:${file.name}`);
+        });
+    </script>
+</body>
+  </html>
