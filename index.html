@@ -4,52 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Islamic Summariser</title>
-    
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a5fb4 0%, #26a269 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
+            color: white;
             min-height: 100vh;
             padding: 20px;
         }
+        .container { max-width: 600px; margin: 0 auto; }
         
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
+        /* Header */
+        .header {
             text-align: center;
-            margin-bottom: 40px;
             padding: 30px 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
+            margin-bottom: 25px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .welcome { color: #4fc3f7; font-weight: bold; margin: 10px 0; }
         
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .feature-card {
+        /* Feature Cards */
+        .feature {
             background: rgba(255, 255, 255, 0.15);
             border-radius: 16px;
             padding: 25px;
@@ -57,192 +38,298 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
         }
+        .feature h3 { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
         
-        .feature-title {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
+        /* Quran Surah Selector */
+        .surah-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
+            margin: 15px 0;
+        }
+        .surah-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .surah-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
         
-        .feature-desc {
-            opacity: 0.9;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
+        /* Buttons */
         .btn {
-            background: #ffffff;
-            color: #1a5fb4;
+            background: #4fc3f7;
+            color: #1a237e;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 30px;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s ease;
+            margin-top: 15px;
+            transition: all 0.3s;
         }
-        
         .btn:hover {
-            background: #f0f0f0;
+            background: #29b6f6;
             transform: translateY(-2px);
         }
         
-        .file-input {
+        /* File Upload */
+        .file-upload {
             width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            border: 2px dashed rgba(255, 255, 255, 0.4);
-            color: white;
-            margin-top: 10px;
-        }
-        
-        footer {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            opacity: 0.8;
-            font-size: 0.9rem;
+            margin: 15px 0;
+            cursor: pointer;
         }
         
-        /* Hide in browser, show in Telegram */
-        .telegram-only {
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 4px solid #4fc3f7;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Result Display */
+        .result {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
+        <!-- Header -->
+        <div class="header">
             <h1>🕌 Islamic Summariser</h1>
-            <p class="subtitle">Mini App for Telegram Bot</p>
+            <p>Mini App for @islamic_summariser_bot</p>
+            <div class="welcome" id="welcome-text">Loading...</div>
             <p>AI-powered Islamic content summarization</p>
+        </div>
+        
+        <!-- Quran Feature -->
+        <div class="feature">
+            <h3>📖 Quran Summaries</h3>
+            <p>Select a Surah for AI summary:</p>
             
-            <!-- This shows only in Telegram -->
-            <div id="telegram-info" class="telegram-only">
-                <p>Running inside Telegram Web App</p>
-                <p id="user-info"></p>
+            <div class="surah-grid" id="surah-grid">
+                <!-- Surah buttons will be added here by JavaScript -->
             </div>
-        </header>
-        
-        <div class="feature-card">
-            <div class="feature-title">📖 Quran & Tafseer</div>
-            <div class="feature-desc">Get AI summaries of Quranic verses with explanations</div>
-            <button class="btn" onclick="openFeature('quran')">Open Quran Reader</button>
+            
+            <div class="loading" id="quran-loading">
+                <div class="loader"></div>
+                <p>Generating AI summary...</p>
+            </div>
+            
+            <div class="result" id="quran-result">
+                <h4>📜 Summary:</h4>
+                <p id="summary-text">Summary will appear here...</p>
+            </div>
         </div>
         
-        <div class="feature-card">
-            <div class="feature-title">🎙️ Voice Notes</div>
-            <div class="feature-desc">Upload Islamic lectures for transcription</div>
-            <input type="file" class="file-input" accept="audio/*" id="voiceInput" onchange="handleFile('voice', this)">
+        <!-- Voice Notes -->
+        <div class="feature">
+            <h3>🎙️ Voice Notes</h3>
+            <p>Upload Islamic lectures (Arabic/Malayalam/English)</p>
+            
+            <div class="file-upload" onclick="document.getElementById('voice-file').click()">
+                📱 Tap to upload voice note
+            </div>
+            <input type="file" id="voice-file" accept="audio/*" style="display:none" onchange="uploadVoice(this)">
+            
+            <div class="loading" id="voice-loading">
+                <div class="loader"></div>
+                <p>Processing voice note...</p>
+            </div>
         </div>
         
-        <div class="feature-card">
-            <div class="feature-title">📄 PDF Processing</div>
-            <div class="feature-desc">Upload Islamic PDFs for summarization</div>
-            <input type="file" class="file-input" accept=".pdf" id="pdfInput" onchange="handleFile('pdf', this)">
+        <!-- PDF Processing -->
+        <div class="feature">
+            <h3>📄 PDF Processing</h3>
+            <p>Upload Islamic PDFs for summarization</p>
+            
+            <div class="file-upload" onclick="document.getElementById('pdf-file').click()">
+                📄 Tap to upload PDF
+            </div>
+            <input type="file" id="pdf-file" accept=".pdf" style="display:none" onchange="uploadPDF(this)">
+            
+            <div class="loading" id="pdf-loading">
+                <div class="loader"></div>
+                <p>Processing PDF...</p>
+            </div>
         </div>
         
-        <div class="feature-card">
-            <div class="feature-title">🌙 Hadith Library</div>
-            <div class="feature-desc">Search and get Hadith explanations</div>
-            <button class="btn" onclick="openFeature('hadith')">Browse Hadith</button>
+        <!-- Footer -->
+        <div style="text-align:center; margin-top:40px; opacity:0.8; font-size:0.9rem;">
+            <p>Powered by free AI • Supports العربية & മലയാളം</p>
+            <p>Connected to @islamic_summariser_bot</p>
         </div>
-        
-        <footer>
-            <p>Powered by free AI models • Arabic & Malayalam support</p>
-            <p>Open via @islamic_summariser_bot</p>
-        </footer>
     </div>
 
     <script>
-        // Initialize Telegram Web App
+        // Telegram Web App
         let tg = window.Telegram.WebApp;
         
-        // Function to check if running in Telegram
-        function isTelegramWebApp() {
-            return typeof window.Telegram !== 'undefined' && 
-                   window.Telegram.WebApp && 
-                   window.Telegram.WebApp.initData !== '';
-        }
-        
-        // Initialize when page loads
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            if (isTelegramWebApp()) {
-                // Running inside Telegram
-                console.log('Running in Telegram Web App');
-                
-                // Initialize Telegram Web App
-                tg.ready();
-                tg.expand();
-                tg.setHeaderColor('#1a5fb4');
-                tg.setBackgroundColor('#26a269');
-                
-                // Show Telegram info
-                document.getElementById('telegram-info').style.display = 'block';
-                
-                // Show user info if available
-                if (tg.initDataUnsafe.user) {
-                    const user = tg.initDataUnsafe.user;
-                    document.getElementById('user-info').textContent = 
-                        `Welcome, ${user.first_name || 'User'}!`;
-                }
-                
-                // Set up Main Button
-                tg.MainButton.setText('Send to Bot').show();
-                tg.MainButton.onClick(function() {
-                    tg.sendData('action_from_mini_app');
-                    tg.close();
-                });
-                
-                // Show alert
-                tg.showAlert('Islamic Summariser Mini App loaded!');
-                
-            } else {
-                // Running in browser
-                console.log('Running in regular browser');
-                document.body.innerHTML += `
-                    <div style="background: #ff6b6b; color: white; padding: 15px; margin: 20px; border-radius: 10px;">
-                        <strong>⚠️ Note:</strong> This app is designed to run inside Telegram.
-                        <br>Open it via @islamic_summariser_bot for full functionality.
-                    </div>
-                `;
+            // Expand to full screen
+            tg.expand();
+            tg.setHeaderColor('#1a237e');
+            tg.setBackgroundColor('#311b92');
+            tg.ready();
+            
+            // Show welcome message
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('welcome-text').innerHTML = 
+                    `👋 Welcome, <strong>${user.first_name || 'User'}</strong>!`;
             }
-        });
-        
-        // Feature functions
-        function openFeature(feature) {
-            if (isTelegramWebApp()) {
-                tg.sendData(`open_${feature}`);
-                tg.showAlert(`Opening ${feature} feature...`);
-            } else {
-                alert(`Feature: ${feature}\n(Would open in Telegram Mini App)`);
-            }
-        }
-        
-        function handleFile(type, input) {
-            const file = input.files[0];
-            if (file) {
-                if (isTelegramWebApp()) {
-                    tg.sendData(`${type}_upload:${file.name}`);
-                    tg.showAlert(`📁 ${type.toUpperCase()}: ${file.name} received!`);
-                } else {
-                    alert(`File selected: ${file.name}\n(Would upload in Telegram)`);
-                }
-            }
-        }
-        
-        // Back button handling
-        if (isTelegramWebApp()) {
-            tg.BackButton.show();
-            tg.BackButton.onClick(function() {
-                tg.sendData('back_pressed');
+            
+            // Setup Main Button
+            tg.MainButton.setText('Open in Main Bot').show();
+            tg.MainButton.onClick(() => {
+                tg.sendData('open_main_bot');
                 tg.close();
             });
+            
+            // Setup Back Button
+            tg.BackButton.show();
+            tg.BackButton.onClick(() => {
+                tg.close();
+            });
+            
+            // Load Quran Surahs
+            loadSurahs();
+        });
+        
+        // Quran Surahs Data
+        const popularSurahs = [
+            { number: 1, name: "Al-Fatihah", arabic: "الفاتحة", verses: 7 },
+            { number: 2, name: "Al-Baqarah", arabic: "البقرة", verses: 286 },
+            { number: 36, name: "Ya-Sin", arabic: "يس", verses: 83 },
+            { number: 55, name: "Ar-Rahman", arabic: "الرحمن", verses: 78 },
+            { number: 67, name: "Al-Mulk", arabic: "الملك", verses: 30 },
+            { number: 112, name: "Al-Ikhlas", arabic: "الإخلاص", verses: 4 },
+            { number: 113, name: "Al-Falaq", arabic: "الفلق", verses: 5 },
+            { number: 114, name: "An-Nas", arabic: "الناس", verses: 6 }
+        ];
+        
+        function loadSurahs() {
+            const grid = document.getElementById('surah-grid');
+            grid.innerHTML = '';
+            
+            popularSurahs.forEach(surah => {
+                const btn = document.createElement('button');
+                btn.className = 'surah-btn';
+                btn.innerHTML = `
+                    <div style="font-size: 0.8rem; opacity: 0.9">${surah.number}</div>
+                    <div style="font-weight: bold">${surah.name}</div>
+                    <div style="font-size: 1.2rem; margin-top: 5px">${surah.arabic}</div>
+                    <div style="font-size: 0.7rem; opacity: 0.7">${surah.verses} verses</div>
+                `;
+                btn.onclick = () => getSurahSummary(surah);
+                grid.appendChild(btn);
+            });
+        }
+        
+        function getSurahSummary(surah) {
+            // Show loading
+            document.getElementById('quran-loading').style.display = 'block';
+            document.getElementById('quran-result').style.display = 'none';
+            
+            // Simulate AI processing (in real app, call your bot API)
+            setTimeout(() => {
+                const summaries = {
+                    1: "The Opening chapter. Praises Allah, seeks guidance to the straight path. Foundation of Islamic prayer.",
+                    2: "The Cow. Longest chapter covering faith, law, stories of prophets. Contains the Throne Verse (2:255).",
+                    36: "Ya-Sin. Heart of the Quran. Discusses resurrection, signs of Allah, and the Hereafter.",
+                    55: "The Most Merciful. Beautiful repetition of Allah's blessings and favors upon creation.",
+                    67: "The Sovereignty. Emphasizes Allah's control over universe, warning about consequences.",
+                    112: "The Sincerity. Pure monotheism - Allah is One, Eternal, Absolute.",
+                    113: "The Daybreak. Seeking protection from evils of creation.",
+                    114: "Mankind. Seeking protection from whispers of Satan and evil."
+                };
+                
+                // Hide loading, show result
+                document.getElementById('quran-loading').style.display = 'none';
+                document.getElementById('quran-result').style.display = 'block';
+                document.getElementById('summary-text').textContent = 
+                    summaries[surah.number] || `Summary of ${surah.name} (${surah.arabic}) - ${surah.verses} verses.`;
+                
+                // Send to Telegram bot
+                tg.sendData(`quran_summary:${surah.number}:${surah.name}`);
+                tg.showAlert(`📖 ${surah.name} summary generated!`);
+                
+            }, 1500); // 1.5 second delay
+        }
+        
+        function uploadVoice(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            document.getElementById('voice-loading').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('voice-loading').style.display = 'none';
+                tg.sendData(`voice_uploaded:${file.name}:${file.size}`);
+                tg.showAlert(`🎙️ Voice note received: ${file.name}`);
+                
+                // In real app, you would upload to your bot/server
+            }, 2000);
+        }
+        
+        function uploadPDF(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            document.getElementById('pdf-loading').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('pdf-loading').style.display = 'none';
+                tg.sendData(`pdf_uploaded:${file.name}:${file.size}`);
+                tg.showAlert(`📄 PDF received: ${file.name}`);
+                
+                // In real app, you would upload to your bot/server
+            }, 2000);
+        }
+        
+        // Additional features
+        function openFullBot() {
+            tg.sendData('open_full_bot');
+            tg.close();
         }
     </script>
 </body>
